@@ -109,7 +109,7 @@ void unittest1()
 
 void unittest2()
 {
-    DeltaMatrixInfo info(CC, EC, MC, MC);
+    DeltaMatrixInfo info(CC, EC, MC, PMC);
     int membershipInfo[MC];
     
     srandomdev();

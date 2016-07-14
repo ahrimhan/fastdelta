@@ -53,7 +53,7 @@ inline uint64_t getTimestamp()
 
 #define DONT_USE_COHESION
 //#define DONT_USE_QUOTIENT
-//#define ONLY_USE_COUPLING_WEIGHT
+#define ONLY_USE_COUPLING_WEIGHT
 
 #ifndef ONLY_USE_COUPLING_WEIGHT
 #define COUPLING_WEIGHT 0.7

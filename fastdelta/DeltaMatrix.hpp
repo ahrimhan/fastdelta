@@ -88,7 +88,6 @@ private:
     SpRowMat mr;
     SpColMat mc;
     SpColMat mtc;
-//    DColMat mic;
     SpRowMat mmt;
 
     SpRowMat l;
@@ -119,12 +118,12 @@ private:
     
     void changeMembership(int entityIdx, int classIdx, int value)
     {
-        mr.coeffRef(entityIdx, classIdx) = value;
+        if( entityIdx < methodPossibleToMoveCount )
+        {
+            mr.coeffRef(entityIdx, classIdx) = value;
+        }
         mtc.coeffRef(classIdx, entityIdx) = value;
-
-        
         mc.coeffRef(entityIdx, classIdx) = value;
-//        mic.coeffRef(entityIdx, classIdx) = value == 0 ? 1 : 0;
     }
     
     void evalPint(SpRowMat& pint_1, DRowMat& pint);

@@ -54,7 +54,7 @@ void DeltaMatrix::internal_init(DeltaMatrix& dm, DeltaMatrixInfo* info)
     SpColMat mc = mr;
     SpColMat mtc = mr.transpose();
     
-//    mr.conservativeResize(methodPossibleToMoveCount, classCount);
+    mr.conservativeResize(methodPossibleToMoveCount, classCount);
     
     uint64_t start2 = getTimestamp();
     SpRowMat mmt = (mr * mtc);
@@ -63,10 +63,10 @@ void DeltaMatrix::internal_init(DeltaMatrix& dm, DeltaMatrixInfo* info)
     
  
     l.setFromTriplets(info->linkInfoList.begin(), info->linkInfoList.end());
-    
     dm.l = l;
+    
 #ifndef DONT_USE_COHESION
-    SpRowMat methodToField = l.topRightCorner(methodCount, fieldCount);
+    SpRowMat methodToField = l.topRightCorner(methodCount, entityCount - methodCount);
     
     uint64_t start = getTimestamp();
     SpRowMat t = methodToField * methodToField.transpose();
@@ -79,13 +79,14 @@ void DeltaMatrix::internal_init(DeltaMatrix& dm, DeltaMatrixInfo* info)
     dm.l += t * COHESION_WEIGHT;
 #endif
     
+    dm.l.conservativeResize(methodPossibleToMoveCount, entityCount);
+    
     SpRowMat lint = dm.l.cwiseProduct(mmt);
-    SpRowMat lext = dm.l.cwiseProduct(DRowMat::Constant(entityCount, entityCount, 1) - mmt);
+    SpRowMat lext = dm.l.cwiseProduct(DRowMat::Constant(methodPossibleToMoveCount, entityCount, 1) - mmt);
     
     dm.mr = mr;
     dm.mc = mc;
     dm.mtc = mtc;
-//    dm.mic = mic;
     dm.mmt = mmt;
     dm.lint = lint;
     dm.lext = lext;
@@ -123,7 +124,7 @@ void DeltaMatrix::move(int entityIdx, int fromClassIdx, int toClassIdx)
 
     mmt.reserve(VectorXi::Constant(entityCount, 2));
     
-    for( int i = 0; i < mtc.cols(); i++ )
+    for( int i = 0; i < mmt.rows(); i++ )
     {
         mmt.coeffRef(i, entityIdx) = mmt.coeff(entityIdx, i);
     }
@@ -133,7 +134,7 @@ void DeltaMatrix::move(int entityIdx, int fromClassIdx, int toClassIdx)
     
     lint.reserve(VectorXi::Constant(entityCount, 2));
     lext.reserve(VectorXi::Constant(entityCount, 2));
-    for( int i = 0; i < mmt.cols(); i++ )
+    for( int i = 0; i < lint.rows(); i++ )
     {
         lint.coeffRef(i, entityIdx) = lint.coeff(entityIdx, i);
         lext.coeffRef(i, entityIdx) = lext.coeff(entityIdx, i);
@@ -166,24 +167,16 @@ void DeltaMatrix::eval()
     {
         for (SpRowMat::InnerIterator it(mr,i); it; ++it)
         {
-            if( it.row() < methodPossibleToMoveCount )
-            {
-                float sum = lint.row(it.row()).sum();
-                pintQ.row(it.row()) = DRowMat::Constant(1, classCount, sum + 1).sparseView();
-                pint.row(it.row()) = DRowMat::Constant(1, classCount, sum).sparseView();
-                pint.coeffRef(it.row(), it.col()) = 0;
-            }
-            else
-            {
-                break;
-            }
+            float sum = lint.row(it.row()).sum();
+            pintQ.row(it.row()) = DRowMat::Constant(1, classCount, sum + 1).sparseView();
+            pint.row(it.row()) = DRowMat::Constant(1, classCount, sum).sparseView();
+            pint.coeffRef(it.row(), it.col()) = 0;
         }
     }
     
     uint64_t stage2 = getTimestamp();
-
-    SpRowMat pext = (lext.topLeftCorner(methodPossibleToMoveCount, entityCount) * mc);
     
+    SpRowMat pext = lext * mc;
     uint64_t stage3 = getTimestamp();
 
 #ifndef DONT_USE_QUOTIENT
