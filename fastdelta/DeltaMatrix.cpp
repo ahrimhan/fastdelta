@@ -23,9 +23,6 @@ bool operator> (const MoveMethodCandidate& lhs, const MoveMethodCandidate& rhs)
 
 bool operator== (const MoveMethodCandidate& lhs, const MoveMethodCandidate& rhs)
 {
-//    fprintf(stderr, "equality check! id(%llX, %llX), entityIdx(%x, %x), toClassIdx(%x, %x), value(%f, %f)\n",
-//            lhs.id, rhs.id, lhs.entityIdx, rhs.entityIdx, lhs.toClassIdx, rhs.toClassIdx,
-//            lhs.value, rhs.value );
     return lhs.id == rhs.id && lhs.value == rhs.value;
 }
 
@@ -40,24 +37,25 @@ void DeltaMatrix::internal_init(DeltaMatrix& dm, DeltaMatrixInfo* info)
     dm.classCount = info->getClassCount();
     dm.entityCount = info->getEntityCount();
     dm.methodCount = info->getMethodCount();
-    dm.fieldCount = dm.entityCount - dm.methodCount;
+    dm.methodPossibleToMoveCount = info->getMethodPossibleToMoveCount();
+//    dm.fieldCount = dm.entityCount - dm.methodCount;
     
     int entityCount = dm.entityCount;
     int classCount = dm.classCount;
     int methodCount = dm.methodCount;
-    int fieldCount = dm.fieldCount;
-        
+//    int fieldCount = dm.fieldCount;
+    int methodPossibleToMoveCount = dm.methodPossibleToMoveCount;
 
     SpRowMat mr(entityCount, classCount);
     SpRowMat l(entityCount, entityCount);
     SpRowMat identity(methodCount, methodCount);
-    
+
     identity.setIdentity();
     
     mr.setFromTriplets(info->membershipInfoList.begin(), info->membershipInfoList.end());
     SpColMat mc = mr;
     SpColMat mtc = mr.transpose();
-    SpColMat mic = DColMat::Constant(entityCount, classCount, 1) - mc;
+    
     uint64_t start2 = getTimestamp();
     SpRowMat mmt = (mr * mtc);
     printf("mr * mtc = %u (%d by %d)\n", getTimestamp() - start2, mr.rows(), mr.cols());
@@ -81,39 +79,22 @@ void DeltaMatrix::internal_init(DeltaMatrix& dm, DeltaMatrixInfo* info)
     dm.l += t * COHESION_WEIGHT;
 #endif
     
-//    for( int i = 0; i < methodCount; i++ )
-//    {
-//        dm.entities.push_back(DeltaMatrixEntity(i, true));
-//    }
-//    
-//    for( int i = methodCount; i < entityCount; i++ )
-//    {
-//        dm.entities.push_back(DeltaMatrixEntity(i, false));
-//    }
-//    
-//    for (int i=0; i < dm.l.outerSize(); i++)
-//    {
-//        for (SpRowMat::InnerIterator it(dm.l,i); it; ++it)
-//        {
-//            dm.entities.at(it.row()).addRelatedEntity(&(dm.entities.at(it.col())));
-//        }
-//    }
-    
     SpRowMat lint = dm.l.cwiseProduct(mmt);
     SpRowMat lext = dm.l.cwiseProduct(DRowMat::Constant(entityCount, entityCount, 1) - mmt);
     
     dm.mr = mr;
     dm.mc = mc;
     dm.mtc = mtc;
-    dm.mic = mic;
+//    dm.mic = mic;
     dm.mmt = mmt;
     dm.lint = lint;
     dm.lext = lext;
-    dm.af.resize(entityCount, classCount);
-    dm.possibleMoveMethodMatrix.resize(entityCount, classCount);
+    dm.af.resize(methodPossibleToMoveCount, classCount);
+    dm.possibleMoveMethodMatrix.resize(methodPossibleToMoveCount, classCount);
     
     
-    dm.possibleMoveMethodMatrix.setFromTriplets(info->possibleMoveMethodList.begin(), info->possibleMoveMethodList.end());
+    dm.possibleMoveMethodMatrix.setFromTriplets(
+        info->possibleMoveMethodList.begin(), info->possibleMoveMethodList.end());
     
     dm.eval();
     
@@ -121,19 +102,6 @@ void DeltaMatrix::internal_init(DeltaMatrix& dm, DeltaMatrixInfo* info)
     dm.prevAdjustedD = dm.adjustedD;
     
     dm.createMoveMethodCandidateSet(dm.moveMethodCandidateSet);
-    
-//    SpRowMat pint = lint * mic;
-//    SpRowMat pext = lext * mc;
-//    SpRowMat pintq = pint + DRowMat::Constant(entityCount, classCount, 1);
-//
-//#ifndef DONT_USE_QUOTIENT
-//    dm.D =  (pint - pext).cwiseQuotient(pintq);
-//#else
-//    dm.D = pint - pext;
-//#endif
-    
-    
-
 }
 
 
@@ -147,6 +115,7 @@ void DeltaMatrix::move(int entityIdx, int fromClassIdx, int toClassIdx)
 {
     changeMembership(entityIdx, fromClassIdx, 0);
     changeMembership(entityIdx, toClassIdx, 1);
+    
     
     SpRowMat::RowXpr mr_row = mr.row(entityIdx);
     
@@ -177,23 +146,54 @@ void DeltaMatrix::move(int entityIdx, int fromClassIdx, int toClassIdx)
 
 void DeltaMatrix::eval()
 {
-    uint64_t start = getTimestamp();
+    omp_set_nested(0);
+
+    uint64_t stage0 = getTimestamp();
     
     prevD = D;
 
+    uint64_t stage1 = getTimestamp();
+
+    SpRowMat pint(methodPossibleToMoveCount, classCount);
+    SpRowMat pintQ(methodPossibleToMoveCount, classCount);
+
+    mr = mr.pruned();
     
-    DRowMat pint = lint * mic;
-    SpRowMat pext = (lext * mc).pruned();
+    pint.reserve(VectorXi::Constant(methodPossibleToMoveCount, classCount));
+    pintQ.reserve(VectorXi::Constant(methodPossibleToMoveCount, classCount));
+
+#pragma omp parallel for
+    for (int i=0; i < mr.outerSize(); i++)
+    {
+        for (SpRowMat::InnerIterator it(mr,i); it; ++it)
+        {
+            if( it.row() < methodPossibleToMoveCount )
+            {
+                float sum = lint.row(it.row()).sum();
+                pintQ.row(it.row()) = DRowMat::Constant(1, classCount, sum + 1).sparseView();
+                pint.row(it.row()) = DRowMat::Constant(1, classCount, sum).sparseView();
+                pint.coeffRef(it.row(), it.col()) = 0;
+            }
+            else
+            {
+                break;
+            }
+        }
+    }
     
+    uint64_t stage2 = getTimestamp();
+
+    SpRowMat pext = (lext.topLeftCorner(methodPossibleToMoveCount, entityCount) * mc);
     
-    SpRowMat spView = pint.sparseView();
-    SpRowMat spViewQ = spView + DColMat::Constant(entityCount, classCount, 1);
-    
+    uint64_t stage3 = getTimestamp();
+
 #ifndef DONT_USE_QUOTIENT
-    D = (spView - pext).cwiseProduct(possibleMoveMethodMatrix).cwiseQuotient(spViewQ).pruned();
+    D = (pint - pext).cwiseProduct(possibleMoveMethodMatrix).cwiseQuotient(pintQ).pruned();
 #else
     D = (spView - pext).cwiseProduct(possibleMoveMethodMatrix).pruned();
 #endif
+    
+    uint64_t stage4 = getTimestamp();
     
     if( useAdjust )
     {
@@ -202,14 +202,16 @@ void DeltaMatrix::eval()
         af *= ADJUST_DECAY_RATE;
     }
     
-    fprintf(stderr, "Elapsed time for native-eval:%u\n", getTimestamp() - start);
+    uint64_t stage5 = getTimestamp();
+    
+    fprintf(stderr, "Elapsed time for eval(total:%lld, stage1:%lld, stage2:%lld, stage3:%lld stage4:%lld stage5:%lld)\n",
+            stage5 - stage0, stage1 - stage0, stage2 - stage1, stage3 - stage2, stage4 - stage3, stage5-stage4);
 }
 
 
 void DeltaMatrix::createMoveMethodCandidateSet(MoveMethodCandidateSet& candidateSet)
 {
     SpRowMat& DD = useAdjust ? adjustedD : D;
-    omp_set_nested(0);
     
     candidateSet.clear();
     MoveMethodCandidateSetIndexByValue& index = candidateSet.get<0>();
@@ -219,7 +221,7 @@ void DeltaMatrix::createMoveMethodCandidateSet(MoveMethodCandidateSet& candidate
     {
         for (SpRowMat::InnerIterator it(DD,i); it; ++it)
         {
-            if( it.row() < methodCount )
+            if( it.row() < methodPossibleToMoveCount )
             {
                 if( it.value() < 0 )
                 {
@@ -256,7 +258,7 @@ MoveMethodCandidateSetIndexByValue& DeltaMatrix::getSortedMoveMethodCandidates()
 
     end = getTimestamp();
     fprintf(stderr, "Build: %s %s\n", __DATE__, __TIME__);
-    fprintf(stderr, "total: %llu, masking: %llu, minus: %llu\n", end-start, interm-start, end-interm);
+    fprintf(stderr, "Elapsed Time for updating sorted set: total: %llu, masking: %llu, minus: %llu\n", end-start, interm-start, end-interm);
 
 
 //    printf("DDD nonZeroSize:%d\n", DD.nonZeros());
@@ -267,7 +269,7 @@ MoveMethodCandidateSetIndexByValue& DeltaMatrix::getSortedMoveMethodCandidates()
     {
         for (SpRowMat::InnerIterator it(diffMat,i); it; ++it)
         {
-            if( it.row() < methodCount )
+            if( it.row() < methodPossibleToMoveCount )
             {
                 float value = DD.coeff(it.row(), it.col());
                 MoveMethodCandidateSetIndexByID::iterator it2 = index.find(MoveMethodCandidate::createID(it.row(), it.col()));

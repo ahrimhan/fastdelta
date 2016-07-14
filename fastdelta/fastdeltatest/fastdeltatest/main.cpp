@@ -36,7 +36,7 @@ static int linkm[9][9] =
 
 void unittest1()
 {
-    DeltaMatrixInfo info(4, 9, 7);
+    DeltaMatrixInfo info(4, 9, 7, 7);
     
     for( int i = 0; i < 9; i++ )
     {
@@ -93,14 +93,14 @@ void unittest1()
     std::cout << d << std::endl << std::endl;
 }
 
-#define CC 700
-#define EC 12000
-#define MC 9000
+#define CC 10
+#define EC 20
+#define MC 16
 
 
 void unittest2()
 {
-    DeltaMatrixInfo info(CC, EC, MC);
+    DeltaMatrixInfo info(CC, EC, MC, MC);
     int membershipInfo[MC];
     
     srandomdev();
@@ -111,7 +111,8 @@ void unittest2()
     {
         for( int j = i + 1; j < EC; j++ )
         {
-            if( (random() % 100) < (100 * 10. / EC))
+//            if( (random() % 100) < (100 * 10. / EC))
+            if( (random() % 100) < 50 )
             {
                 info.addLink(i, j);
             }
@@ -170,6 +171,7 @@ void unittest2()
         
         start = getTimestamp();
         dm.move(methodIdx, fromClassIdx, toClassIdx);
+        membershipInfo[methodIdx] = toClassIdx;
         interm = getTimestamp();
         dm.eval();
         end = getTimestamp();

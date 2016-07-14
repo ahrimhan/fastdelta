@@ -29,9 +29,9 @@ public:
 };
 
 void Java_kr_ac_kaist_se_deltatable_DeltaTableInfo_initialize(JNIEnv *env, jobject obj,
-                                                              jint classCount, jint entityCount, jint methodCount)
+                                                              jint classCount, jint entityCount, jint methodCount, jint methodPossibleToMoveCount)
 {
-    DeltaMatrixInfo *info = new DeltaMatrixInfo(classCount, entityCount, methodCount);
+    DeltaMatrixInfo *info = new DeltaMatrixInfo(classCount, entityCount, methodCount, methodPossibleToMoveCount);
     if( info )
     {
         setHandle(env, obj, info);
@@ -106,7 +106,7 @@ void Java_kr_ac_kaist_se_deltatable_DeltaTableInfo_dispose(JNIEnv *env, jobject 
 
 void Java_kr_ac_kaist_se_deltatable_DeltaTableEngine_initialize(JNIEnv *env, jobject obj, jobject info)
 {
-    DeltaMatrix* dm = new DeltaMatrix(true);
+    DeltaMatrix* dm = new DeltaMatrix(false);
     DeltaMatrixInfo* i = getHandle<DeltaMatrixInfo>(env, info);
 
     if( dm && i )

@@ -88,7 +88,7 @@ private:
     SpRowMat mr;
     SpColMat mc;
     SpColMat mtc;
-    DColMat mic;
+//    DColMat mic;
     SpRowMat mmt;
 
     SpRowMat l;
@@ -104,8 +104,9 @@ private:
     
     int entityCount;
     int methodCount;
-    int fieldCount;
+//    int fieldCount;
     int classCount;
+    int methodPossibleToMoveCount;
     
     bool useAdjust;
     
@@ -117,14 +118,14 @@ private:
     
     static void internal_init(DeltaMatrix& dm, DeltaMatrixInfo* info);
     
-    inline void changeMembership(int entityIdx, int classIdx, int value)
+    void changeMembership(int entityIdx, int classIdx, int value)
     {
         mr.coeffRef(entityIdx, classIdx) = value;
         mtc.coeffRef(classIdx, entityIdx) = value;
 
         
         mc.coeffRef(entityIdx, classIdx) = value;
-        mic.coeffRef(entityIdx, classIdx) = value == 1 ? 0 : 1;
+//        mic.coeffRef(entityIdx, classIdx) = value == 0 ? 1 : 0;
     }
     
     void evalPint(SpRowMat& pint_1, DRowMat& pint);
@@ -136,7 +137,7 @@ public:
     }
     
     DeltaMatrix(const DeltaMatrix& dm) : useAdjust(dm.useAdjust), mr(dm.mr), mc(dm.mc),
-    mtc(dm.mtc), mic(dm.mic), l(dm.l), mmt(dm.mmt), lint(dm.lint), lext(dm.lext), D(dm.D)
+    mtc(dm.mtc), /*mic(dm.mic),*/ l(dm.l), mmt(dm.mmt), lint(dm.lint), lext(dm.lext), D(dm.D)
     {
     }
     

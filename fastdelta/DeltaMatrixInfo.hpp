@@ -19,6 +19,7 @@ private:
     int classCount;
     int entityCount;
     int methodCount;
+    int methodPossibleToMoveCount;
     
     std::vector<DTT> membershipInfoList;
     std::vector<DTT> linkInfoList;
@@ -27,11 +28,12 @@ private:
 
     
 public:
-    DeltaMatrixInfo(int classCount, int entityCount, int methodCount)
+    DeltaMatrixInfo(int classCount, int entityCount, int methodCount, int methodPossibleToMoveCount)
     {
         this->classCount = classCount;
         this->entityCount = entityCount;
         this->methodCount = methodCount;
+        this->methodPossibleToMoveCount = methodPossibleToMoveCount;
         
         possibleMoveMethodList.reserve(this->classCount * 15);
         membershipInfoList.reserve(this->classCount * 15);
@@ -76,6 +78,11 @@ public:
     int getMethodCount()
     {
         return methodCount;
+    }
+    
+    int getMethodPossibleToMoveCount()
+    {
+        return methodPossibleToMoveCount;
     }
     
     friend class DeltaMatrix;

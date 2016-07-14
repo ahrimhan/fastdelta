@@ -10,10 +10,10 @@ extern "C" {
 /*
  * Class:     kr_ac_kaist_se_deltatable_DeltaTableInfo
  * Method:    initialize
- * Signature: (III)V
+ * Signature: (IIII)V
  */
 JNIEXPORT void JNICALL Java_kr_ac_kaist_se_deltatable_DeltaTableInfo_initialize
-  (JNIEnv *, jobject, jint, jint, jint);
+  (JNIEnv *, jobject, jint, jint, jint, jint);
 
 /*
  * Class:     kr_ac_kaist_se_deltatable_DeltaTableInfo
