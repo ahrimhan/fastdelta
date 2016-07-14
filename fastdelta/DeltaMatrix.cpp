@@ -38,12 +38,10 @@ void DeltaMatrix::internal_init(DeltaMatrix& dm, DeltaMatrixInfo* info)
     dm.entityCount = info->getEntityCount();
     dm.methodCount = info->getMethodCount();
     dm.methodPossibleToMoveCount = info->getMethodPossibleToMoveCount();
-//    dm.fieldCount = dm.entityCount - dm.methodCount;
     
     int entityCount = dm.entityCount;
     int classCount = dm.classCount;
     int methodCount = dm.methodCount;
-//    int fieldCount = dm.fieldCount;
     int methodPossibleToMoveCount = dm.methodPossibleToMoveCount;
 
     SpRowMat mr(entityCount, classCount);
@@ -55,6 +53,8 @@ void DeltaMatrix::internal_init(DeltaMatrix& dm, DeltaMatrixInfo* info)
     mr.setFromTriplets(info->membershipInfoList.begin(), info->membershipInfoList.end());
     SpColMat mc = mr;
     SpColMat mtc = mr.transpose();
+    
+//    mr.conservativeResize(methodPossibleToMoveCount, classCount);
     
     uint64_t start2 = getTimestamp();
     SpRowMat mmt = (mr * mtc);
@@ -91,8 +91,7 @@ void DeltaMatrix::internal_init(DeltaMatrix& dm, DeltaMatrixInfo* info)
     dm.lext = lext;
     dm.af.resize(methodPossibleToMoveCount, classCount);
     dm.possibleMoveMethodMatrix.resize(methodPossibleToMoveCount, classCount);
-    
-    
+        
     dm.possibleMoveMethodMatrix.setFromTriplets(
         info->possibleMoveMethodList.begin(), info->possibleMoveMethodList.end());
     

@@ -104,7 +104,6 @@ private:
     
     int entityCount;
     int methodCount;
-//    int fieldCount;
     int classCount;
     int methodPossibleToMoveCount;
     

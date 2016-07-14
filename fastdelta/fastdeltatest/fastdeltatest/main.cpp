@@ -58,7 +58,10 @@ void unittest1()
                 info.addMembership(i, j);
             }
             
-            info.possibleMoveMethod(i, j);
+            if( i < 7 )
+            {
+                info.possibleMoveMethod(i, j);
+            }
         }
     }
     
@@ -91,11 +94,17 @@ void unittest1()
     dm.eval();
     
     std::cout << d << std::endl << std::endl;
+    
+    d.conservativeResize(3, 4);
+    std::cout << d << std::endl << std::endl;
+
+    
 }
 
-#define CC 10
-#define EC 20
-#define MC 16
+#define CC 1000
+#define EC 20000
+#define MC 16000
+#define PMC 8000
 
 
 void unittest2()
@@ -111,8 +120,8 @@ void unittest2()
     {
         for( int j = i + 1; j < EC; j++ )
         {
-//            if( (random() % 100) < (100 * 10. / EC))
-            if( (random() % 100) < 50 )
+            if( (random() % 100) < (100 * 20. / EC))
+//            if( (random() % 100) < 50 )
             {
                 info.addLink(i, j);
             }
@@ -128,7 +137,7 @@ void unittest2()
         }
     }
     
-    for( int i = 0; i < MC; i++ )
+    for( int i = 0; i < PMC; i++ )
     {
         for( int j = 0; j < CC; j++ )
         {
