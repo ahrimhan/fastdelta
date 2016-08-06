@@ -28,7 +28,8 @@ void DeltaValue::init(DeltaMatrixInfo *info)
     mc = mr;
     
     
-    l.setFromTriplets(info->linkInfoList.begin(), info->linkInfoList.end());
+    l.setFromTriplets(info->methodCallList.begin(), info->methodCallList.end());
+    l.setFromTriplets(info->fieldAccessList.begin(), info->fieldAccessList.end());
     
 #ifndef DONT_USE_COHESION
     SpRowMat methodToField = l.topRightCorner(methodCount, fieldCount);

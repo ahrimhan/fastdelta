@@ -22,7 +22,8 @@ private:
     int methodPossibleToMoveCount;
     
     std::vector<DTT> membershipInfoList;
-    std::vector<DTT> linkInfoList;
+    std::vector<DTT> methodCallList;
+    std::vector<DTT> fieldAccessList;
     std::vector<DTT> possibleMoveMethodList;
     
 
@@ -37,7 +38,8 @@ public:
         
         possibleMoveMethodList.reserve(this->classCount * 15);
         membershipInfoList.reserve(this->classCount * 15);
-        linkInfoList.reserve(this->entityCount * 15);
+        fieldAccessList.reserve(this->entityCount * 15);
+        methodCallList.reserve(this->entityCount * 15);
         
     }
     
@@ -45,13 +47,13 @@ public:
     {
         if( toEntityIdx < methodCount )
         {
-            linkInfoList.push_back(DTT(fromEntityIdx, toEntityIdx, COUPLING_WEIGHT));
-            linkInfoList.push_back(DTT(toEntityIdx, fromEntityIdx, COUPLING_WEIGHT));
+            methodCallList.push_back(DTT(fromEntityIdx, toEntityIdx, 1));
+            methodCallList.push_back(DTT(toEntityIdx, fromEntityIdx, 1));
         }
         else
         {
-            linkInfoList.push_back(DTT(fromEntityIdx, toEntityIdx, COUPLING_WEIGHT + COHESION_WEIGHT));
-            linkInfoList.push_back(DTT(toEntityIdx, fromEntityIdx, COUPLING_WEIGHT + COHESION_WEIGHT));
+            fieldAccessList.push_back(DTT(fromEntityIdx, toEntityIdx, 1));
+            fieldAccessList.push_back(DTT(toEntityIdx, fromEntityIdx, 1));
         }
     }
     

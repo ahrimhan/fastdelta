@@ -11,76 +11,21 @@
 
 #include <stdio.h>
 #include <vector>
-//#include <set>
+#include <map>
 #include "TypeDef.h"
 #include "DeltaMatrixInfo.hpp"
 #include "DeltaMatrixEntity.hpp"
-
-#include <boost/multi_index_container.hpp>
-#include <boost/multi_index/ordered_index.hpp>
-#include <boost/multi_index/identity.hpp>
-#include <boost/multi_index/member.hpp>
-#include <boost/multi_index/composite_key.hpp>
+#include "LinkMatrix.hpp"
+#include "MoveMethodCandidate.hpp"
+#include "MoveMethodCandidateParetoFrontSet.hpp"
 
 
 //  D = (L^(MR*MRT))*(MI=(1-MC)) - (L^(1-(MR*MR.T)))*MC
 
 #pragma GCC visibility push(default)
 
-class MoveMethodCandidate
-{
-public:
-    uint64_t id;
-    int entityIdx;
-    int toClassIdx;
-    float value;
-    
-    MoveMethodCandidate(int _entityIdx, int _toClassIdx, float _value) :
-    entityIdx(_entityIdx), toClassIdx(_toClassIdx), value(_value)
-    {
-        id = createID(_entityIdx, _toClassIdx);
-    }
-    
-    MoveMethodCandidate(const MoveMethodCandidate& mmc) :
-    id(mmc.id), entityIdx(mmc.entityIdx), toClassIdx(mmc.toClassIdx), value(mmc.value)
-    {
-    }
-    
-    static uint64_t createID(int _entityIdx, int _toClassIdx)
-    {
-        uint64_t ret = _entityIdx;
-        ret = (ret << 32) | _toClassIdx;
-        return ret;
-    }
-    
-    
-    friend bool operator<(const MoveMethodCandidate& lhs, const MoveMethodCandidate& rhs);
-    friend bool operator>(const MoveMethodCandidate& lhs, const MoveMethodCandidate& rhs);
-    friend bool operator==(const MoveMethodCandidate& lhs, const MoveMethodCandidate& rhs);
-    friend bool operator!=(const MoveMethodCandidate& lhs, const MoveMethodCandidate& rhs);
-};
 
-
-
-typedef boost::multi_index_container<
-    MoveMethodCandidate,
-    boost::multi_index::indexed_by<
-        boost::multi_index::ordered_unique<
-            boost::multi_index::composite_key<MoveMethodCandidate,
-                boost::multi_index::member<MoveMethodCandidate,float,&MoveMethodCandidate::value>,
-                boost::multi_index::member<MoveMethodCandidate,uint64_t,&MoveMethodCandidate::id>
-            >
-        >,
-        boost::multi_index::ordered_unique<
-            boost::multi_index::member<MoveMethodCandidate,uint64_t,&MoveMethodCandidate::id>
-        >
-    >
-> MoveMethodCandidateSet;
-
-typedef MoveMethodCandidateSet::nth_index<0>::type MoveMethodCandidateSetIndexByValue;
-
-typedef MoveMethodCandidateSet::nth_index<1>::type MoveMethodCandidateSetIndexByID;
-
+class LinkMatrix;
 
 class DeltaMatrix
 {
@@ -90,31 +35,18 @@ private:
     SpColMat mtc;
     SpRowMat mmt;
 
-    SpRowMat l;
-    SpRowMat lint;
-    SpRowMat lext;
-
-    SpRowMat prevD;
-    SpRowMat D;
-    SpRowMat possibleMoveMethodMatrix;
-    SpRowMat af;
-    SpRowMat adjustedD;
-    SpRowMat prevAdjustedD;
+    LinkMatrix linkMatrixList[LINK_MATRIX_COUNT];
     
+    SpRowMat possibleMoveMethodMatrix;
+    MoveMethodCandidateParetoFrontSet moveMethodCandidateParetoFrontSet;
+
     int entityCount;
     int methodCount;
     int classCount;
     int methodPossibleToMoveCount;
-    
-    bool useAdjust;
-    
+        
     std::vector<DeltaMatrixEntity> entities;
     
-    
-    MoveMethodCandidateSet moveMethodCandidateSet;
-    
-    
-    static void internal_init(DeltaMatrix& dm, DeltaMatrixInfo* info);
     
     void changeMembership(int entityIdx, int classIdx, int value)
     {
@@ -126,16 +58,19 @@ private:
         mc.coeffRef(entityIdx, classIdx) = value;
     }
     
-    void evalPint(SpRowMat& pint_1, DRowMat& pint);
+//    void evalPint(SpRowMat& pint_1, DRowMat& pint);
     
+    
+    void initMembership(DeltaMatrixInfo* info);
+    void createCouplingBasedLink(DeltaMatrixInfo* info,
+                                 float methodCallWeight, float fieldAccessWeight, LinkMatrix& link, bool useQuotient);
+    void createSharedFieldAccessLink(DeltaMatrixInfo* info, LinkMatrix& link);
+    void createSharedMethodCallLink(DeltaMatrixInfo* info, LinkMatrix& link);
+
+    void initLink(DeltaMatrixInfo* info);
     
 public:
-    DeltaMatrix(bool _useAdjust) : useAdjust(_useAdjust)
-    {
-    }
-    
-    DeltaMatrix(const DeltaMatrix& dm) : useAdjust(dm.useAdjust), mr(dm.mr), mc(dm.mc),
-    mtc(dm.mtc), /*mic(dm.mic),*/ l(dm.l), mmt(dm.mmt), lint(dm.lint), lext(dm.lext), D(dm.D)
+    DeltaMatrix()
     {
     }
     
@@ -145,20 +80,29 @@ public:
         
     void init(DeltaMatrixInfo* info);
     
-    void createMoveMethodCandidateSet(MoveMethodCandidateSet& candidateSet);
+    void createMoveMethodCandidateSet(MoveMethodCandidateParetoFrontSet& mmcSet);
     
     void move(int entityIdx, int fromClassIdx, int toClassIdx);
     
     void eval();
     
-    MoveMethodCandidateSetIndexByValue& getSortedMoveMethodCandidates();
+    MoveMethodCandidateParetoFrontIterator* getSortedMoveMethodCandidates();
+        
+    friend class LinkMatrix;
     
-    DeltaMatrix* copy() { return new DeltaMatrix(*this); }
+    LinkMatrix& getLinkMatrix(int idx)
+    {
+        return linkMatrixList[idx];
+    }
     
-    SpRowMat& getD() { return D; }
-    
-    SpRowMat& getAdjustedD() { return adjustedD; }
+    MoveMethodCandidateParetoFrontSet& getParetoSet()
+    {
+        return moveMethodCandidateParetoFrontSet;
+    }
 };
+
+
+
 
 #pragma GCC visibility pop
 

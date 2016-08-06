@@ -12,6 +12,8 @@
 		5B2399371D17DFF0002BE58E /* kr_ac_kaist_se_deltatable_DeltaTableEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B2399351D17DFF0002BE58E /* kr_ac_kaist_se_deltatable_DeltaTableEngine.h */; };
 		5B2399381D17DFF0002BE58E /* kr_ac_kaist_se_deltatable_DeltaTableInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B2399361D17DFF0002BE58E /* kr_ac_kaist_se_deltatable_DeltaTableInfo.h */; };
 		5B23993A1D17E087002BE58E /* jni_support.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B2399391D17E087002BE58E /* jni_support.cpp */; };
+		5B34DDD81D39D11C00C97C33 /* LinkMatrix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B34DDD61D39D11C00C97C33 /* LinkMatrix.cpp */; };
+		5B34DDD91D39D11C00C97C33 /* LinkMatrix.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 5B34DDD71D39D11C00C97C33 /* LinkMatrix.hpp */; };
 		5B38CED61D2179DA00A1CA83 /* libiomp5.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 5B38CED51D2179DA00A1CA83 /* libiomp5.dylib */; };
 		5B38CED91D226D4A00A1CA83 /* DeltaMatrixEntity.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B38CED71D226D4A00A1CA83 /* DeltaMatrixEntity.cpp */; };
 		5B38CEDA1D226D4A00A1CA83 /* DeltaMatrixEntity.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 5B38CED81D226D4A00A1CA83 /* DeltaMatrixEntity.hpp */; };
@@ -28,6 +30,11 @@
 		5B38CEF41D27886800A1CA83 /* DeltaValue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B38CEF21D27886800A1CA83 /* DeltaValue.cpp */; };
 		5B38CEF51D27886800A1CA83 /* DeltaValue.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 5B38CEF31D27886800A1CA83 /* DeltaValue.hpp */; };
 		5B38CEF71D27A6A500A1CA83 /* kr_ac_kaist_se_deltatable_DeltaValueEngine.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B38CEF61D27A6A500A1CA83 /* kr_ac_kaist_se_deltatable_DeltaValueEngine.h */; };
+		5B3DC53C1D5210A60043429C /* handle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B3DC53B1D5210A60043429C /* handle.cpp */; };
+		5B846B531D544F9F00B0F95E /* MoveMethodCandidate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B846B511D544F9F00B0F95E /* MoveMethodCandidate.cpp */; };
+		5B846B541D544F9F00B0F95E /* MoveMethodCandidate.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 5B846B521D544F9F00B0F95E /* MoveMethodCandidate.hpp */; };
+		5B846B581D54515900B0F95E /* MoveMethodCandidateParetoFrontSet.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B846B561D54515900B0F95E /* MoveMethodCandidateParetoFrontSet.cpp */; };
+		5B846B591D54515900B0F95E /* MoveMethodCandidateParetoFrontSet.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 5B846B571D54515900B0F95E /* MoveMethodCandidateParetoFrontSet.hpp */; };
 		5BB827CB1D1A120300FE13CB /* DeltaMatrixInfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BB827C91D1A120300FE13CB /* DeltaMatrixInfo.cpp */; };
 		5BB827CC1D1A120300FE13CB /* DeltaMatrixInfo.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 5BB827CA1D1A120300FE13CB /* DeltaMatrixInfo.hpp */; };
 		5BB827D31D1A269800FE13CB /* libfastdelta.dylib in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5BAF1F671D0995B600F42ACA /* libfastdelta.dylib */; };
@@ -64,6 +71,8 @@
 		5B2399361D17DFF0002BE58E /* kr_ac_kaist_se_deltatable_DeltaTableInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = kr_ac_kaist_se_deltatable_DeltaTableInfo.h; path = jni/kr_ac_kaist_se_deltatable_DeltaTableInfo.h; sourceTree = "<group>"; };
 		5B2399391D17E087002BE58E /* jni_support.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jni_support.cpp; sourceTree = "<group>"; };
 		5B23993B1D17E0DB002BE58E /* handle.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = handle.h; sourceTree = "<group>"; };
+		5B34DDD61D39D11C00C97C33 /* LinkMatrix.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LinkMatrix.cpp; sourceTree = "<group>"; };
+		5B34DDD71D39D11C00C97C33 /* LinkMatrix.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = LinkMatrix.hpp; sourceTree = "<group>"; };
 		5B38CED51D2179DA00A1CA83 /* libiomp5.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libiomp5.dylib; path = ../../../../usr/local/lib/libiomp5.dylib; sourceTree = "<group>"; };
 		5B38CED71D226D4A00A1CA83 /* DeltaMatrixEntity.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DeltaMatrixEntity.cpp; sourceTree = "<group>"; };
 		5B38CED81D226D4A00A1CA83 /* DeltaMatrixEntity.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DeltaMatrixEntity.hpp; sourceTree = "<group>"; };
@@ -80,6 +89,11 @@
 		5B38CEF21D27886800A1CA83 /* DeltaValue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DeltaValue.cpp; sourceTree = "<group>"; };
 		5B38CEF31D27886800A1CA83 /* DeltaValue.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DeltaValue.hpp; sourceTree = "<group>"; };
 		5B38CEF61D27A6A500A1CA83 /* kr_ac_kaist_se_deltatable_DeltaValueEngine.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = kr_ac_kaist_se_deltatable_DeltaValueEngine.h; path = jni/kr_ac_kaist_se_deltatable_DeltaValueEngine.h; sourceTree = "<group>"; };
+		5B3DC53B1D5210A60043429C /* handle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = handle.cpp; sourceTree = "<group>"; };
+		5B846B511D544F9F00B0F95E /* MoveMethodCandidate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MoveMethodCandidate.cpp; sourceTree = "<group>"; };
+		5B846B521D544F9F00B0F95E /* MoveMethodCandidate.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MoveMethodCandidate.hpp; sourceTree = "<group>"; };
+		5B846B561D54515900B0F95E /* MoveMethodCandidateParetoFrontSet.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MoveMethodCandidateParetoFrontSet.cpp; sourceTree = "<group>"; };
+		5B846B571D54515900B0F95E /* MoveMethodCandidateParetoFrontSet.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = MoveMethodCandidateParetoFrontSet.hpp; sourceTree = "<group>"; };
 		5BAF1F671D0995B600F42ACA /* libfastdelta.dylib */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.dylib"; includeInIndex = 0; path = libfastdelta.dylib; sourceTree = BUILT_PRODUCTS_DIR; };
 		5BB827C91D1A120300FE13CB /* DeltaMatrixInfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DeltaMatrixInfo.cpp; sourceTree = "<group>"; };
 		5BB827CA1D1A120300FE13CB /* DeltaMatrixInfo.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = DeltaMatrixInfo.hpp; sourceTree = "<group>"; };
@@ -111,6 +125,12 @@
 				5BB827CD1D1A123E00FE13CB /* TypeDef.h */,
 				5B38CEF21D27886800A1CA83 /* DeltaValue.cpp */,
 				5B38CEF31D27886800A1CA83 /* DeltaValue.hpp */,
+				5B34DDD61D39D11C00C97C33 /* LinkMatrix.cpp */,
+				5B34DDD71D39D11C00C97C33 /* LinkMatrix.hpp */,
+				5B846B511D544F9F00B0F95E /* MoveMethodCandidate.cpp */,
+				5B846B521D544F9F00B0F95E /* MoveMethodCandidate.hpp */,
+				5B846B561D54515900B0F95E /* MoveMethodCandidateParetoFrontSet.cpp */,
+				5B846B571D54515900B0F95E /* MoveMethodCandidateParetoFrontSet.hpp */,
 			);
 			name = core;
 			sourceTree = "<group>";
@@ -124,6 +144,7 @@
 				5B2399361D17DFF0002BE58E /* kr_ac_kaist_se_deltatable_DeltaTableInfo.h */,
 				5B2399391D17E087002BE58E /* jni_support.cpp */,
 				5B23993B1D17E0DB002BE58E /* handle.h */,
+				5B3DC53B1D5210A60043429C /* handle.cpp */,
 			);
 			name = jni;
 			sourceTree = "<group>";
@@ -203,13 +224,16 @@
 				5B38CEF71D27A6A500A1CA83 /* kr_ac_kaist_se_deltatable_DeltaValueEngine.h in Headers */,
 				5B38CEF11D27536E00A1CA83 /* RemoveClassOperation.hpp in Headers */,
 				5B38CEDE1D2748A000A1CA83 /* MoveMethodOperation.hpp in Headers */,
+				5B846B541D544F9F00B0F95E /* MoveMethodCandidate.hpp in Headers */,
 				5BB827F41D20CE8100FE13CB /* kr_ac_kaist_se_deltatable_DeltaTableEntryIterator.h in Headers */,
 				5B38CEED1D2750B900A1CA83 /* CreateClassOperation.hpp in Headers */,
 				5B38CEF51D27886800A1CA83 /* DeltaValue.hpp in Headers */,
 				5B38CEE91D274EC500A1CA83 /* MoveFieldOperation.hpp in Headers */,
 				5B2399341D178394002BE58E /* DeltaMatrix.hpp in Headers */,
 				5B38CEDA1D226D4A00A1CA83 /* DeltaMatrixEntity.hpp in Headers */,
+				5B846B591D54515900B0F95E /* MoveMethodCandidateParetoFrontSet.hpp in Headers */,
 				5B38CEE21D2748C400A1CA83 /* RefactoringOperation.hpp in Headers */,
+				5B34DDD91D39D11C00C97C33 /* LinkMatrix.hpp in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -286,11 +310,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5B846B581D54515900B0F95E /* MoveMethodCandidateParetoFrontSet.cpp in Sources */,
+				5B846B531D544F9F00B0F95E /* MoveMethodCandidate.cpp in Sources */,
 				5B38CEE11D2748C400A1CA83 /* RefactoringOperation.cpp in Sources */,
 				5B38CEE81D274EC500A1CA83 /* MoveFieldOperation.cpp in Sources */,
 				5B23993A1D17E087002BE58E /* jni_support.cpp in Sources */,
+				5B3DC53C1D5210A60043429C /* handle.cpp in Sources */,
 				5B2399331D178394002BE58E /* DeltaMatrix.cpp in Sources */,
 				5B38CEEC1D2750B900A1CA83 /* CreateClassOperation.cpp in Sources */,
+				5B34DDD81D39D11C00C97C33 /* LinkMatrix.cpp in Sources */,
 				5B38CEF01D27536E00A1CA83 /* RemoveClassOperation.cpp in Sources */,
 				5B38CEF41D27886800A1CA83 /* DeltaValue.cpp in Sources */,
 				5B38CEDD1D2748A000A1CA83 /* MoveMethodOperation.cpp in Sources */,

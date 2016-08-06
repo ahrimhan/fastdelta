@@ -65,18 +65,18 @@ void unittest1()
         }
     }
     
-    DeltaMatrix dm(false);
+    DeltaMatrix dm;
     dm.init(&info);
-    SpRowMat& d = dm.getD();
+    SpRowMat& d = dm.getLinkMatrix(0).getD();
     std::cout << d << std::endl << std::endl;
     
     
-    MoveMethodCandidateSetIndexByValue& result =  dm.getSortedMoveMethodCandidates();
-    for( MoveMethodCandidateSetIndexByValue::iterator it = result.begin();
-        it != result.end(); it++ )
+    MoveMethodCandidateParetoFrontIterator* result =  dm.getSortedMoveMethodCandidates();
+    while( result->hasNext() )
     {
-        std::cout << "(e, c, v):" << it->entityIdx << ", " << it->toClassIdx << ", " << it->value << "\n";
+        std::cout << *(result->next()) << "\n";
     }
+    delete result;
     
     
     dm.move(1, 0, 3);
@@ -84,27 +84,21 @@ void unittest1()
     std::cout << d << std::endl << std::endl;
     
     result =  dm.getSortedMoveMethodCandidates();
-    for( MoveMethodCandidateSetIndexByValue::iterator it = result.begin();
-        it != result.end(); it++ )
+    while( result->hasNext() )
     {
-        std::cout << "(e, c, v):" << it->entityIdx << ", " << it->toClassIdx << ", " << it->value << "\n";
+        std::cout << *(result->next()) << "\n";
     }
     
     dm.move(1, 3, 0);
     dm.eval();
     
     std::cout << d << std::endl << std::endl;
-    
-    d.conservativeResize(3, 4);
-    std::cout << d << std::endl << std::endl;
-
-    
 }
 
-#define CC 1000
-#define EC 20000
-#define MC 16000
-#define PMC 8000
+#define CC 10
+#define EC 20
+#define MC 16
+#define PMC 12
 
 
 void unittest2()
@@ -120,8 +114,8 @@ void unittest2()
     {
         for( int j = i + 1; j < EC; j++ )
         {
-            if( (random() % 100) < (100 * 20. / EC))
-//            if( (random() % 100) < 50 )
+//            if( (random() % 100) < (100 * 20. / EC))
+            if( (random() % 100) < 50 )
             {
                 info.addLink(i, j);
             }
@@ -148,7 +142,7 @@ void unittest2()
     printf("Complete loading...(class:%d, entity:%d)\n\n", CC, EC);
     
     
-    DeltaMatrix dm(false);
+    DeltaMatrix dm;
     start = getTimestamp();
     dm.init(&info);
     end = getTimestamp();
@@ -165,11 +159,11 @@ void unittest2()
     printf("testD = %f, D = %f\n", testD, dm.getD().coeff(1000, 1));
     */
     
-    MoveMethodCandidateSet testCandidateSet;
+    MoveMethodCandidateParetoFrontSet testCandidateSet;
     
-    for( int i = 0; i < 50; i++ )
+    for( int i = 0; i < 5; i++ )
     {
-        int methodIdx = random() % MC;
+        int methodIdx = random() % PMC;
         int fromClassIdx = membershipInfo[methodIdx];
         int toClassIdx = random() % CC;
         
@@ -189,7 +183,7 @@ void unittest2()
         
         start = getTimestamp();
         
-        MoveMethodCandidateSetIndexByValue& valueIndex = dm.getSortedMoveMethodCandidates();
+        MoveMethodCandidateParetoFrontIterator* iter1 = dm.getSortedMoveMethodCandidates();
         
         end = getTimestamp();
         std::cout << "get sorted set by update: " << (end - start) << std::endl;
@@ -199,15 +193,33 @@ void unittest2()
         end = getTimestamp();
         std::cout << "get sorted set by creating: " << (end - start) << std::endl;
 
-
-        if( valueIndex == testCandidateSet.get<0>() )
+        
+        MoveMethodCandidateParetoFrontIterator* iter2 = testCandidateSet.getIterator();
+        
+        
+        while( iter1->hasNext() )
+        {
+            iter1->next();
+//            std::cout << *(iter1->next()) << std::endl;
+        }
+        
+        std::cout << "======================================\n";
+        
+        while( iter2->hasNext() )
+        {
+            iter2->next();
+//            std::cout << *(iter2->next()) << std::endl;
+        }
+        
+        
+        if( testCandidateSet == dm.getParetoSet() )
         {
             std::cout << "[SUCCESS] updateed sorted set is equal to created one\n";
         }
         else
         {
             
-            fprintf(stderr, "[FAIL] updateed sorted set is not equal to created one(updated:%lu, created:%lu\n", valueIndex.size(), testCandidateSet.get<0>().size());
+            fprintf(stderr, "[FAIL] updateed sorted set is not equal to created one\n");
         }
         
     }

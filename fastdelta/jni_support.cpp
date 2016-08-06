@@ -17,12 +17,11 @@
 
 class EntryIterator {
 public:
-    MoveMethodCandidateSetIndexByValue& index;
-    MoveMethodCandidateSetIndexByValue::iterator curIter;
+    MoveMethodCandidateParetoFrontIterator* curIter;
     int cutoff;
     int curCount;
     
-    EntryIterator(MoveMethodCandidateSetIndexByValue& v, int k) : index(v), curIter(v.begin()), cutoff(k)
+    EntryIterator(MoveMethodCandidateParetoFrontIterator* v, int k) : curIter(v), cutoff(k)
     {
         curCount = 0;
     }
@@ -106,7 +105,7 @@ void Java_kr_ac_kaist_se_deltatable_DeltaTableInfo_dispose(JNIEnv *env, jobject 
 
 void Java_kr_ac_kaist_se_deltatable_DeltaTableEngine_initialize(JNIEnv *env, jobject obj, jobject info)
 {
-    DeltaMatrix* dm = new DeltaMatrix(false);
+    DeltaMatrix* dm = new DeltaMatrix();
     DeltaMatrixInfo* i = getHandle<DeltaMatrixInfo>(env, info);
 
     if( dm && i )
@@ -144,8 +143,7 @@ jlong Java_kr_ac_kaist_se_deltatable_DeltaTableEngine__1getTopK(JNIEnv *env, job
     if( dm )
     {
     
-        MoveMethodCandidateSetIndexByValue& index = dm->getSortedMoveMethodCandidates();
-        EntryIterator* ei = new EntryIterator(index, k);
+        EntryIterator* ei = new EntryIterator(dm->getSortedMoveMethodCandidates(), k);
         
         jlong handle = reinterpret_cast<jlong>(ei);
         
@@ -175,7 +173,7 @@ jint Java_kr_ac_kaist_se_deltatable_DeltaTableEntryIterator__1hasNext(JNIEnv *en
 {
     EntryIterator* ei = getHandle<EntryIterator>(env, obj);
     
-    if( ei && ei->curIter != ei->index.end() &&
+    if( ei && ei->curIter->hasNext() &&
        (ei->cutoff <= 0 || ei->curCount < ei->cutoff) )
     {
         return 1;
@@ -190,13 +188,13 @@ jint Java_kr_ac_kaist_se_deltatable_DeltaTableEntryIterator__1next(JNIEnv *env, 
 {
     EntryIterator* ei = getHandle<EntryIterator>(env, obj);
    
-    if( ei && ei->curIter != ei->index.end() &&
+    if( ei && ei->curIter->hasNext() &&
        (ei->cutoff <= 0 || ei->curCount < ei->cutoff))
     {
-        setIntField(env, target, "toClassIdx", ei->curIter->toClassIdx);
-        setIntField(env, target, "entityIdx", ei->curIter->entityIdx);
-        setFloatField(env, target, "deltaValue", ei->curIter->value);
-        ei->curIter++;
+        MoveMethodCandidatePtr candidate = ei->curIter->next();
+        setIntField(env, target, "toClassIdx", candidate->toClassIdx);
+        setIntField(env, target, "entityIdx", candidate->entityIdx);
+        setFloatArrayField(env, target, "deltaValueList", candidate->valueList, LINK_MATRIX_COUNT);
         ei->curCount++;
         return 1;
     }
@@ -212,6 +210,7 @@ void JNICALL Java_kr_ac_kaist_se_deltatable_DeltaTableEntryIterator_dispose(JNIE
     
     if( ei )
     {
+        delete ei->curIter;
         delete ei;
     }
 

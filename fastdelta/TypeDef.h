@@ -51,19 +51,10 @@ inline uint64_t getTimestamp()
     return t;
 }
 
-#define DONT_USE_COHESION
 //#define DONT_USE_QUOTIENT
-#define ONLY_USE_COUPLING_WEIGHT
+//#define ONLY_USE_COUPLING_WEIGHT
 
-#ifndef ONLY_USE_COUPLING_WEIGHT
-#define COUPLING_WEIGHT 0.7
-#define COHESION_WEIGHT 0.3
-#else
-#define COUPLING_WEIGHT 1.0
-#define COHESION_WEIGHT 0.0
-#endif
-
-#define ADJUST_DECAY_RATE 0.9
-#define ADJUST_INCREMENT 0.3
+#define COHESION_WEIGHT 0.7
+#define LINK_MATRIX_COUNT 2
 
 #endif /* TypeDef_h */

@@ -9,13 +9,9 @@
 #ifndef _HANDLE_H_INCLUDED_
 #define _HANDLE_H_INCLUDED_
 
-jfieldID getHandleField(JNIEnv *env, jobject obj)
-{
-    jclass c = env->GetObjectClass(obj);
-    // J is the type signature for long:
-    return env->GetFieldID(c, "nativeHandle", "J");
-}
+#include <jni.h>
 
+jfieldID getHandleField(JNIEnv *env, jobject obj);
 
 
 template <typename T>
@@ -32,23 +28,9 @@ void setHandle(JNIEnv *env, jobject obj, T *t)
     env->SetLongField(obj, getHandleField(env, obj), handle);
 }
 
-void unsetHandle(JNIEnv *env, jobject obj)
-{
-    env->SetLongField(obj, getHandleField(env, obj), 0);
-}
-
-inline void setIntField(JNIEnv* env, jobject obj, char* fieldName, jint value)
-{
-    jclass c = env->GetObjectClass(obj);
-    
-    env->SetIntField(obj, env->GetFieldID(c, fieldName, "I"), value);
-}
-
-inline void setFloatField(JNIEnv* env, jobject obj, char* fieldName, jfloat value)
-{
-    jclass c = env->GetObjectClass(obj);
-    
-    env->SetFloatField(obj, env->GetFieldID(c, fieldName, "F"), value);
-}
+void unsetHandle(JNIEnv *env, jobject obj);
+void setIntField(JNIEnv* env, jobject obj, char* fieldName, jint value);
+void setFloatField(JNIEnv* env, jobject obj, char* fieldName, jfloat value);
+void setFloatArrayField(JNIEnv* env, jobject obj, char* fieldName, const float* valueList, int valueCount);
 
 #endif
