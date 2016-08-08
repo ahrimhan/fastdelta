@@ -8,8 +8,6 @@
 
 #include "MoveMethodCandidate.hpp"
 
-MoveMethodCandidate* MoveMethodCandidate::nullInstance = nullptr;
-
 
 bool operator< (const MoveMethodCandidate& lhs, const MoveMethodCandidate& rhs)
 {

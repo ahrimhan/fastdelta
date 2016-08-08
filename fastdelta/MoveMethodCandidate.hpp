@@ -15,6 +15,7 @@
 #include <boost/multi_index/member.hpp>
 #include <boost/multi_index/composite_key.hpp>
 #include <iostream>
+#include <set>
 #include "TypeDef.h"
 
 #pragma GCC visibility push(default)
@@ -38,7 +39,10 @@ public:
     int toClassIdx;
     float valueList[LINK_MATRIX_COUNT];
     MoveMethodCandidateParetoFrontPtr belongingParetoFront;
-    std::vector<MoveMethodCandidatePtr> dominatingCandidate;
+    
+    std::set<MoveMethodCandidatePtr> betterCandidate;
+    std::set<MoveMethodCandidatePtr> worseCandidate;
+    
     
     MoveMethodCandidate(int _entityIdx, int _toClassIdx, float* values) :
     entityIdx(_entityIdx), toClassIdx(_toClassIdx)

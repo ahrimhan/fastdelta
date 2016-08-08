@@ -191,6 +191,16 @@ void MoveMethodCandidateParetoFrontSet::set(int _entityIdx, int _toClassIdx, flo
         
         paretoFront->remove(_entityIdx, _toClassIdx);
         
+        if( paretoFront->size() == 0 )
+        {
+            for( MoveMethodCandidateParetoContainerIndex::iterator it = paretoFrontContainer.get<0>().begin(); it != paretoFrontContainer.get<0>().end(); it++ )
+            {
+                if( it->get() == paretoFront.get() )
+                {
+                    paretoFrontContainer.get<0>().erase(it);
+                }
+            }
+        }
         
         if( !hasNeg )
         {
