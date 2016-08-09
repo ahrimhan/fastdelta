@@ -28,6 +28,11 @@ class MoveMethodCandidate;
 typedef std::shared_ptr<MoveMethodCandidate> MoveMethodCandidatePtr;
 
 
+typedef std::set<MoveMethodCandidatePtr> MoveMethodCandidateSet;
+
+
+
+
 class MoveMethodCandidate
 {
 private:
@@ -40,8 +45,8 @@ public:
     float valueList[LINK_MATRIX_COUNT];
     MoveMethodCandidateParetoFrontPtr belongingParetoFront;
     
-    std::set<MoveMethodCandidatePtr> betterCandidate;
-    std::set<MoveMethodCandidatePtr> worseCandidate;
+    MoveMethodCandidateSet betterCandidate;
+    MoveMethodCandidateSet worseCandidate;
     
     
     MoveMethodCandidate(int _entityIdx, int _toClassIdx, float* values) :
@@ -70,6 +75,14 @@ public:
         return ret;
     }
     
+    void updateValue(float* values)
+    {
+        for( int i = 0; i < LINK_MATRIX_COUNT; i++ )
+        {
+            valueList[i] = values[i];
+        }
+    }
+    
     
     friend bool operator<(const MoveMethodCandidate& lhs, const MoveMethodCandidate& rhs);
     friend bool operator>(const MoveMethodCandidate& lhs, const MoveMethodCandidate& rhs);
@@ -81,11 +94,23 @@ public:
 
 
 
+
 bool operator< (const MoveMethodCandidate& lhs, const MoveMethodCandidate& rhs);
 bool operator> (const MoveMethodCandidate& lhs, const MoveMethodCandidate& rhs);
 bool operator== (const MoveMethodCandidate& lhs, const MoveMethodCandidate& rhs);
 bool operator!= (const MoveMethodCandidate& lhs, const MoveMethodCandidate& rhs);
 std::ostream& operator<<(std::ostream& os, const MoveMethodCandidate& mmc);
+
+typedef boost::multi_index_container<
+MoveMethodCandidatePtr,
+boost::multi_index::indexed_by<
+boost::multi_index::ordered_unique<
+boost::multi_index::member<MoveMethodCandidate,uint64_t,&MoveMethodCandidate::id>,
+std::less<uint64_t>
+>
+>
+> MoveMethodCandidateContainer;
+typedef MoveMethodCandidateContainer::nth_index<0>::type MoveMethodCandidateContainerIndex;
 
 
 #pragma GCC visibility pop

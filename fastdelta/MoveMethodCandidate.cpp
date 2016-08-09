@@ -21,6 +21,7 @@ bool operator> (const MoveMethodCandidate& lhs, const MoveMethodCandidate& rhs)
 
 bool operator== (const MoveMethodCandidate& lhs, const MoveMethodCandidate& rhs)
 {
+    
     return lhs.id == rhs.id;
 }
 

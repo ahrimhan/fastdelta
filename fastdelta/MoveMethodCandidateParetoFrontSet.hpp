@@ -8,7 +8,6 @@
 
 #ifndef MoveMethodCandidateParetoFrontSet_hpp
 #define MoveMethodCandidateParetoFrontSet_hpp
-
 #include "MoveMethodCandidate.hpp"
 
 #include <boost/multi_index/sequenced_index.hpp>
@@ -16,17 +15,9 @@
 
 #pragma GCC visibility push(default)
 
-typedef boost::multi_index_container<
-MoveMethodCandidatePtr,
-boost::multi_index::indexed_by<
-boost::multi_index::ordered_unique<
-boost::multi_index::member<MoveMethodCandidate,uint64_t,&MoveMethodCandidate::id>,
-std::less<uint64_t>
->
->
-> MoveMethodCandidateContainer;
-typedef MoveMethodCandidateContainer::nth_index<0>::type MoveMethodCandidateContainerIndex;
 
+
+/*
 
 class MoveMethodCandidateParetoFront
 {
@@ -109,7 +100,7 @@ public:
 
 
 bool operator== (const MoveMethodCandidateParetoFrontSet& lhs, const MoveMethodCandidateParetoFrontSet& rhs);
-
+*/
 
 #pragma GCC visibility pop
 

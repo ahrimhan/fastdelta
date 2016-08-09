@@ -17,7 +17,7 @@
 #include "DeltaMatrixEntity.hpp"
 #include "LinkMatrix.hpp"
 #include "MoveMethodCandidate.hpp"
-#include "MoveMethodCandidateParetoFrontSet.hpp"
+#include "MoveMethodPartialOrderSet.hpp"
 
 
 //  D = (L^(MR*MRT))*(MI=(1-MC)) - (L^(1-(MR*MR.T)))*MC
@@ -38,7 +38,7 @@ private:
     LinkMatrix linkMatrixList[LINK_MATRIX_COUNT];
     
     SpRowMat possibleMoveMethodMatrix;
-    MoveMethodCandidateParetoFrontSet moveMethodCandidateParetoFrontSet;
+    MoveMethodPartialOrderSet moveMethodCandidateParetoFrontSet;
 
     int entityCount;
     int methodCount;
@@ -80,13 +80,13 @@ public:
         
     void init(DeltaMatrixInfo* info);
     
-    void createMoveMethodCandidateSet(MoveMethodCandidateParetoFrontSet& mmcSet);
+    void createMoveMethodCandidateSet(MoveMethodPartialOrderSet& mmcSet);
     
     void move(int entityIdx, int fromClassIdx, int toClassIdx);
     
     void eval();
     
-    MoveMethodCandidateParetoFrontIterator* getSortedMoveMethodCandidates();
+    MoveMethodPartialOrderIterator* getSortedMoveMethodCandidates();
         
     friend class LinkMatrix;
     
@@ -95,7 +95,7 @@ public:
         return linkMatrixList[idx];
     }
     
-    MoveMethodCandidateParetoFrontSet& getParetoSet()
+    MoveMethodPartialOrderSet& getParetoSet()
     {
         return moveMethodCandidateParetoFrontSet;
     }

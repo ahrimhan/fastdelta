@@ -17,11 +17,11 @@
 
 class EntryIterator {
 public:
-    MoveMethodCandidateParetoFrontIterator* curIter;
+    MoveMethodPartialOrderIterator* curIter;
     int cutoff;
     int curCount;
     
-    EntryIterator(MoveMethodCandidateParetoFrontIterator* v, int k) : curIter(v), cutoff(k)
+    EntryIterator(MoveMethodPartialOrderIterator* v, int k) : curIter(v), cutoff(k)
     {
         curCount = 0;
     }

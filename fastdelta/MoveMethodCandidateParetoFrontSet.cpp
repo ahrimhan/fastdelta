@@ -8,7 +8,7 @@
 
 #include "MoveMethodCandidateParetoFrontSet.hpp"
 
-
+/*
 #pragma mark - MoveMethodCandidateParetoFront
 
 void MoveMethodCandidateParetoFront::put(MoveMethodCandidatePtr candidate)
@@ -278,3 +278,4 @@ bool operator== (const MoveMethodCandidateParetoFrontSet& lhs, const MoveMethodC
 {
     return lhs.paretoFrontContainer == rhs.paretoFrontContainer;
 }
+*/

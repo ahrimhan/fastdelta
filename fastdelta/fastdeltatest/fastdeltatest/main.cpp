@@ -71,7 +71,7 @@ void unittest1()
     std::cout << d << std::endl << std::endl;
     
     
-    MoveMethodCandidateParetoFrontIterator* result =  dm.getSortedMoveMethodCandidates();
+    MoveMethodPartialOrderIterator* result =  dm.getSortedMoveMethodCandidates();
     while( result->hasNext() )
     {
         std::cout << *(result->next()) << "\n";
@@ -95,10 +95,15 @@ void unittest1()
     std::cout << d << std::endl << std::endl;
 }
 
-#define CC 10
-#define EC 20
-#define MC 16
-#define PMC 12
+#define CC 700
+#define EC 10000
+#define MC 8000
+#define PMC 6000
+
+//#define CC 5
+//#define EC 10
+//#define MC 8
+//#define PMC 6
 
 
 void unittest2()
@@ -114,8 +119,8 @@ void unittest2()
     {
         for( int j = i + 1; j < EC; j++ )
         {
-//            if( (random() % 100) < (100 * 20. / EC))
-            if( (random() % 100) < 50 )
+            if( (random() % 100) < (100 * 20. / EC))
+//            if( (random() % 100) < 50 )
             {
                 info.addLink(i, j);
             }
@@ -159,7 +164,7 @@ void unittest2()
     printf("testD = %f, D = %f\n", testD, dm.getD().coeff(1000, 1));
     */
     
-    MoveMethodCandidateParetoFrontSet testCandidateSet;
+    MoveMethodPartialOrderSet testCandidateSet;
     
     for( int i = 0; i < 5; i++ )
     {
@@ -183,7 +188,7 @@ void unittest2()
         
         start = getTimestamp();
         
-        MoveMethodCandidateParetoFrontIterator* iter1 = dm.getSortedMoveMethodCandidates();
+        MoveMethodPartialOrderIterator* iter1 = dm.getSortedMoveMethodCandidates();
         
         end = getTimestamp();
         std::cout << "get sorted set by update: " << (end - start) << std::endl;
@@ -194,22 +199,23 @@ void unittest2()
         std::cout << "get sorted set by creating: " << (end - start) << std::endl;
 
         
-        MoveMethodCandidateParetoFrontIterator* iter2 = testCandidateSet.getIterator();
-        
-        
-        while( iter1->hasNext() )
-        {
-            iter1->next();
+        delete iter1;
+//        MoveMethodPartialOrderIterator* iter2 = testCandidateSet.getIterator();
+//        
+//        
+//        while( iter1->hasNext() )
+//        {
+////            iter1->next();
 //            std::cout << *(iter1->next()) << std::endl;
-        }
+//        }
         
-        std::cout << "======================================\n";
-        
-        while( iter2->hasNext() )
-        {
-            iter2->next();
+//        std::cout << "======================================\n";
+//        
+//        while( iter2->hasNext() )
+//        {
+////            iter2->next();
 //            std::cout << *(iter2->next()) << std::endl;
-        }
+//        }
         
         
         if( testCandidateSet == dm.getParetoSet() )
@@ -221,11 +227,7 @@ void unittest2()
             
             fprintf(stderr, "[FAIL] updateed sorted set is not equal to created one\n");
         }
-        
     }
-    
-    
-
 }
 
 

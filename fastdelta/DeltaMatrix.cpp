@@ -132,7 +132,7 @@ void DeltaMatrix::eval()
 }
 
 
-void DeltaMatrix::createMoveMethodCandidateSet(MoveMethodCandidateParetoFrontSet& mmcSet)
+void DeltaMatrix::createMoveMethodCandidateSet(MoveMethodPartialOrderSet& mmcSet)
 {
     for (int i=0; i < methodPossibleToMoveCount; i++)
     {
@@ -146,12 +146,25 @@ void DeltaMatrix::createMoveMethodCandidateSet(MoveMethodCandidateParetoFrontSet
             }
             
             mmcSet.set(i, j, values);
+            
+            
+            
+//            MoveMethodPartialOrderIterator* it = mmcSet.getIterator();
+//            
+//            while( it->hasNext() )
+//            {
+//                std::cout << *(it->next()) << std::endl;
+//            }
+//            std::cout << "---------------------\n";
+//            delete it;
         }
     }
+    
+    
 }
 
 
-MoveMethodCandidateParetoFrontIterator* DeltaMatrix::getSortedMoveMethodCandidates()
+MoveMethodPartialOrderIterator* DeltaMatrix::getSortedMoveMethodCandidates()
 {
     SpRowMat diffMat(methodPossibleToMoveCount, classCount);
     
