@@ -17,12 +17,11 @@ bool MoveMethodPartialOrderIterator::hasNext()
 }
 
 
-MoveMethodCandidatePtr MoveMethodPartialOrderIterator::next()
+MoveMethodCandidate* MoveMethodPartialOrderIterator::next()
 {
     if( queue.size() == 0 ) return NULL;
     
-    MoveMethodCandidatePtr ret = queue.front();
-    visitedNode.insert(ret);
+    MoveMethodCandidate* ret = queue.front();
     queue.erase(queue.begin());
     
     for( MoveMethodCandidateSet::iterator it = ret->worseCandidate.begin();
@@ -41,50 +40,91 @@ MoveMethodCandidatePtr MoveMethodPartialOrderIterator::next()
 
 
 
-static int compareVector(float* lhs, float* rhs)
+//static int compareVector(float* lhs, float* rhs)
+//{
+//    int l = 0;
+//    int w = 0;
+//    
+//    for( int i = 0; i < LINK_MATRIX_COUNT; i++ )
+//    {
+//        if( lhs[i] < rhs[i] )
+//        {
+//            w++;
+//        }
+//        else if( lhs[i] > rhs[i] )
+//        {
+//            l++;
+//        }
+//    }
+//    
+//    if( w == 0 && l > 0 )
+//    {
+//        return 1;
+//    }
+//    else if( l == 0 && w > 0 )
+//    {
+//        return -1;
+//    }
+//    else
+//    {
+//        return 0;
+//    }
+//}
+
+typedef union {
+    float f;
+    struct {
+        unsigned int mantisa : 23;
+        unsigned int exponent : 8;
+        unsigned int sign : 1;
+    } parts;
+} double_cast;
+
+
+static int fastCompareVector(float* lhs, float* rhs)
 {
+//    for( int i = 0; i < LINK_MATRIX_COUNT; i++ )
+//    {
+//        if( lhs[i] < rhs[i] )
+//        {
+//            l|=0x1;
+//        }
+//        else if( lhs[i] > rhs[i] )
+//        {
+//            l|=0x2;
+//        }
+//    }
     int l = 0;
-    int w = 0;
+    double_cast f1;
+    double_cast f2;
     
-    for( int i = 0; i < LINK_MATRIX_COUNT; i++ )
-    {
-        if( lhs[i] < rhs[i] )
-        {
-            w++;
-        }
-        else if( lhs[i] > rhs[i] )
-        {
-            l++;
-        }
-    }
+    f1.f = (lhs[0] - rhs[0]);
+    f2.f = (rhs[0] - lhs[0]);
     
-    if( w == 0 && l > 0 )
-    {
-        return 1;
-    }
-    else if( l == 0 && w > 0 )
-    {
-        return -1;
-    }
-    else
-    {
-        return 0;
-    }
+    l |= f1.parts.sign | f2.parts.sign << 1;
+
+    f1.f = (lhs[1] - rhs[1]);
+    f2.f = (rhs[1] - lhs[1]);
+
+    l |= f1.parts.sign | f2.parts.sign << 1;
+
+    return l;
 }
 
-static int compareCandidate(MoveMethodCandidatePtr a, MoveMethodCandidatePtr b)
+static int compareCandidate(MoveMethodCandidate* a, MoveMethodCandidate* b)
 {
-    return compareVector(a->valueList, b->valueList);
+    return fastCompareVector(a->valueList, b->valueList);
 }
 
 
-static void linkCandidates(MoveMethodCandidatePtr betterOne, MoveMethodCandidatePtr worseOne)
+
+static void linkCandidates(MoveMethodCandidate* betterOne, MoveMethodCandidate* worseOne)
 {
     betterOne->worseCandidate.insert(worseOne);
     worseOne->betterCandidate.insert(betterOne);
 }
 
-static void unlinkCandidates(MoveMethodCandidatePtr betterOne, MoveMethodCandidatePtr worseOne)
+static void unlinkCandidates(MoveMethodCandidate* betterOne, MoveMethodCandidate* worseOne)
 {
     betterOne->worseCandidate.erase(worseOne);
     worseOne->betterCandidate.erase(betterOne);
@@ -93,7 +133,7 @@ static void unlinkCandidates(MoveMethodCandidatePtr betterOne, MoveMethodCandida
 void MoveMethodPartialOrderSet::set(int _entityIdx, int _toClassIdx, float* values)
 {
     
-    MoveMethodCandidatePtr mmcPtr;
+    MoveMethodCandidate* mmcPtr;
     
     bool hasNeg = false;
     
@@ -115,7 +155,7 @@ void MoveMethodPartialOrderSet::set(int _entityIdx, int _toClassIdx, float* valu
     
     if( findIt != allCandidate.get<0>().end() )
     {
-        mmcPtr = (*findIt);
+        mmcPtr = (*findIt).get();
         for( MoveMethodCandidateSet::iterator it2 = mmcPtr->betterCandidate.begin();
             it2 != mmcPtr->betterCandidate.end(); it2++ )
         {
@@ -138,17 +178,17 @@ void MoveMethodPartialOrderSet::set(int _entityIdx, int _toClassIdx, float* valu
     }
     else
     {
-        mmcPtr = MoveMethodCandidatePtr(new MoveMethodCandidate(_entityIdx, _toClassIdx, values));
-        allCandidate.get<0>().insert(mmcPtr);
+        mmcPtr = new MoveMethodCandidate(_entityIdx, _toClassIdx, values);
+        allCandidate.get<0>().insert(MoveMethodCandidatePtr(mmcPtr));
     }
     
     
     for( MoveMethodCandidateContainerIndex::iterator containerIt = allCandidate.get<0>().begin();
-        containerIt != allCandidate.get<0>().end(); containerIt++ )
+        containerIt != allCandidate.get<0>().end(); ++containerIt )
     {
-        MoveMethodCandidatePtr existingCandidatePtr = (*containerIt);
+        MoveMethodCandidate* existingCandidatePtr = (*containerIt).get();
         int res = compareCandidate(mmcPtr, existingCandidatePtr);
-        if( res < 0 )
+        if( res == 1 )
         {
             // mmcPtr is better than existingCandidatePtr
             
@@ -158,14 +198,14 @@ void MoveMethodPartialOrderSet::set(int _entityIdx, int _toClassIdx, float* valu
                 setIt != mmcPtr->worseCandidate.end(); )
             {
                 MoveMethodCandidateSet::iterator currentSetIt = setIt++;
-                MoveMethodCandidatePtr candidateInWorseSetPtr = (*currentSetIt);
+                MoveMethodCandidate* candidateInWorseSetPtr = (*currentSetIt);
                 int res2 = compareCandidate(candidateInWorseSetPtr, existingCandidatePtr);
-                if( res2 < 0 )
+                if( res2 == 1 )
                 {
                     needToLink = false;
                     break;
                 }
-                else if( res2 > 0 )
+                else if( res2 == 2 )
                 {
                     unlinkCandidates(mmcPtr, candidateInWorseSetPtr);
                 }
@@ -182,7 +222,7 @@ void MoveMethodPartialOrderSet::set(int _entityIdx, int _toClassIdx, float* valu
                 firstSet.erase(firstSetIt);
             }
         }
-        else if( res > 0 )
+        else if( res == 2 )
         {
             // mmcPtr is worse than exisingCandidatePtr
             
@@ -192,13 +232,13 @@ void MoveMethodPartialOrderSet::set(int _entityIdx, int _toClassIdx, float* valu
                 setIt != mmcPtr->betterCandidate.end(); )
             {
                 MoveMethodCandidateSet::iterator currentSetIt = setIt++;
-                MoveMethodCandidatePtr candidateInBetterSetPtr = (*currentSetIt);
+                MoveMethodCandidate* candidateInBetterSetPtr = (*currentSetIt);
                 int res2 = compareCandidate(candidateInBetterSetPtr, existingCandidatePtr);
-                if( res2 < 0 )
+                if( res2 == 1 )
                 {
                     unlinkCandidates(candidateInBetterSetPtr, mmcPtr);
                 }
-                else if( res2 > 0 )
+                else if( res2 == 2 )
                 {
                     needToLink = false;
                     break;
@@ -218,8 +258,8 @@ void MoveMethodPartialOrderSet::set(int _entityIdx, int _toClassIdx, float* valu
         for( MoveMethodCandidateSet::iterator setIt2 = mmcPtr->worseCandidate.begin();
             setIt2 != mmcPtr->worseCandidate.end(); setIt2++ )
         {
-            MoveMethodCandidatePtr candidateInBetterSetPtr = (*setIt1);
-            MoveMethodCandidatePtr candidateInWorseSetPtr = (*setIt2);
+            MoveMethodCandidate* candidateInBetterSetPtr = (*setIt1);
+            MoveMethodCandidate* candidateInWorseSetPtr = (*setIt2);
             
             
             MoveMethodCandidateSet::iterator findSetIt = candidateInBetterSetPtr->worseCandidate.find(candidateInWorseSetPtr);
@@ -278,8 +318,8 @@ bool operator== (const MoveMethodPartialOrderSet& lhs, const MoveMethodPartialOr
     
     while(lhsIterator->hasNext())
     {
-        MoveMethodCandidatePtr lhsElem = lhsIterator->next();
-        MoveMethodCandidatePtr rhsElem = rhsIterator->next();
+        MoveMethodCandidate* lhsElem = lhsIterator->next();
+        MoveMethodCandidate* rhsElem = rhsIterator->next();
         
         if( *lhsElem != *rhsElem )
         {

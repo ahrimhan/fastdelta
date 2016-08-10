@@ -16,6 +16,7 @@
 #include <boost/multi_index/composite_key.hpp>
 #include <iostream>
 #include <set>
+#include <unordered_set>
 #include "TypeDef.h"
 
 #pragma GCC visibility push(default)
@@ -27,8 +28,21 @@ typedef std::shared_ptr<MoveMethodCandidateParetoFront> MoveMethodCandidateParet
 class MoveMethodCandidate;
 typedef std::shared_ptr<MoveMethodCandidate> MoveMethodCandidatePtr;
 
+struct MoveMethodCandidatePtrHash {
+    size_t operator() (const MoveMethodCandidate* mmc) const {
+        return (size_t)mmc;
+    }
+};
 
-typedef std::set<MoveMethodCandidatePtr> MoveMethodCandidateSet;
+struct EqualFn
+{
+    bool operator() (MoveMethodCandidate* t1, MoveMethodCandidate* t2) const
+    {
+        return t1 == t2;
+    }
+};
+
+typedef std::unordered_set<MoveMethodCandidate*, MoveMethodCandidatePtrHash, EqualFn> MoveMethodCandidateSet;
 
 
 

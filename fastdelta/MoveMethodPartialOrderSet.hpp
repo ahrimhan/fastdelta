@@ -18,8 +18,8 @@
 class MoveMethodPartialOrderIterator
 {
 private:
-    std::vector<MoveMethodCandidatePtr> queue;
-    std::set<MoveMethodCandidatePtr> visitedNode;
+    std::vector<MoveMethodCandidate*> queue;
+    MoveMethodCandidateSet visitedNode;
 public:
     MoveMethodPartialOrderIterator(MoveMethodCandidateSet& firstSet)
     {
@@ -34,7 +34,7 @@ public:
     }
     
     bool hasNext();
-    MoveMethodCandidatePtr next();
+    MoveMethodCandidate* next();
 };
 
 

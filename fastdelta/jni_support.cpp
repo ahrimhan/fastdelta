@@ -191,7 +191,7 @@ jint Java_kr_ac_kaist_se_deltatable_DeltaTableEntryIterator__1next(JNIEnv *env, 
     if( ei && ei->curIter->hasNext() &&
        (ei->cutoff <= 0 || ei->curCount < ei->cutoff))
     {
-        MoveMethodCandidatePtr candidate = ei->curIter->next();
+        MoveMethodCandidate* candidate = ei->curIter->next();
         setIntField(env, target, "toClassIdx", candidate->toClassIdx);
         setIntField(env, target, "entityIdx", candidate->entityIdx);
         setFloatArrayField(env, target, "deltaValueList", candidate->valueList, LINK_MATRIX_COUNT);
